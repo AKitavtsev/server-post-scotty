@@ -64,7 +64,7 @@ routes pool = do
       Left st -> do
         status st
         json ()
-      Right id -> do
+      Right (id, adm) -> do
         status (Status 200 "OK")
         userMb <- liftIO $ findUserByID pool id
         user <- createdUser userMb     
@@ -80,33 +80,36 @@ routes pool = do
        status (Status 405 "Password wrong")    
     token <- createdToken tokenMb        
     return token   
+
+  delete "/user/:token/:id" $ do
+    token   <- param "token" :: ActionM String
+    id      <- param "id"    :: ActionM String
+    curtime <- liftIO $ curTimeStr "%Y%m%d%H%M%S"
+    case  (testToken token curtime) of
+      Left st -> do
+        status st
+      Right (i, adm) -> do
+        case adm  of      
+          True -> do
+            deleteUserByID pool (read id :: Integer)
+            status (Status 204 "Delete")
+          False  -> status (Status 407 "No admin")
+    json ()
+            
+        
+    
+
+    
+    
+    
+  -- delete "/admin/articles/:id" $ do 
+     -- id <- param "id" :: ActionM TL.Text -- get the article id
+     -- deleteArticle pool id  -- delete the article from the DB
+     -- deletedArticle id      -- show info that the article was deleted
+
         
 
     
-              -- get    "/articles/:id" $ do id <- param "id" :: ActionM TL.Text -- get the article id from the request
-                                          -- maybeArticle <- liftIO $ findArticle pool id -- get the article from the DB
-                                          -- viewArticle maybeArticle            -- show the article if it was found
-
-    -- if not UUID, it's not an account ID, so 404
-    -- let maybeUuid = fromString accId
-    -- case maybeUuid of
-      -- Nothing -> accountNotFound
-      -- Just accUuid -> do
-
-        -- returns the account if it exists
-        -- maybeAccount <- fetchDb $ getAccount accUuid
-
-        -- case maybeAccount of
-          -- Nothing -> accountNotFound
-          -- Just acc -> json $ Success $ AccountSerializer acc
-
--- Cory type AppActionM = ActionT Text (ReaderT (TVar DB.Database) IO)
--- scotty newtype ActionT e m a
--- accountNotFound :: AppActionM ()
--- accountNotFound = do
--- scotty status :: Status -> ActionM ()
-  -- status notFound404
-  -- json $ Error "Account not found"
  
 insertUser :: Pool Connection -> UserIn -> ActionT TL.Text IO ()
 insertUser pool (UserIn name surname avatar login password) = do
@@ -142,6 +145,11 @@ findUserByID pool id = do
          return $ pass res
          where pass [(id, n, sn, av, log, dat, adm)] = Just (UserOut id n sn av log dat adm)
                pass _ = Nothing 
+
+deleteUserByID :: Pool Connection -> Integer -> ActionT TL.Text IO ()
+deleteUserByID pool id = do
+     liftIO $ execSqlT pool [id] "DELETE FROM users WHERE user_id=?"
+     return ()
                               
 createdToken :: Maybe Token -> ActionM ()
 createdToken Nothing = json ()

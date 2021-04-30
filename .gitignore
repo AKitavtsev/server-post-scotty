@@ -1,2 +1,5 @@
 .stack-work/
-*~
+.vscode
+.history
+local_server.conf
+.git/

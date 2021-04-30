@@ -6,6 +6,9 @@ curl -v "http://localhost:3000/token?login=KIT&password=KIT3095"
 
 curl -v http://localhost:3000/user/1.1202104301627401b4056772f899bfcb6a0c827a3ccc222
 
+
+curl -v -X DELETE http://localhost:3000/user/1.1202104301627401b4056772f899bfcb6a0c827a3ccc222/2
+
 psql -d posts -U postgres
 
 
