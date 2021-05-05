@@ -25,13 +25,15 @@ dependencies:
 - bytestring
 # - containers
 - configurator
-# - hspec
+- file-embed
+- hspec
 # - hspec-wai
 # - hspec-wai-json
 - http-types
 - MissingH
 - mtl
 - postgresql-simple
+# - postgresql-simple-migration
 - resource-pool
 # - scientific
 - scotty

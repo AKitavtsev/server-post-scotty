@@ -8,8 +8,9 @@ import Control.Monad (when)
 import Control.Monad.Trans
 import Data.Aeson (eitherDecode )
 import Database.PostgreSQL.Simple
-import Data.Hash.MD5
+-- import Data.Hash.MD5
 import Data.Pool (Pool)
+
 import qualified Data.Text.Lazy as TL
 -- import Data.UUID
 -- import Data.UUID.V4
@@ -79,7 +80,22 @@ routes pool = do
     when  (tokenMb == Nothing)  $ do
        status (Status 405 "Password wrong")    
     token <- createdToken tokenMb        
-    return token   
+    return token
+
+
+-- так работает 
+-- http://localhost:3000/file/?path=D:\myprograms\haskell\example\server\server-post-scotty\images\kit.jpg
+  -- get "/file" $ do
+    -- path <- param "path" :: ActionM String
+    -- file path
+
+    
+-- это не работает в адресной строке 
+-- http://localhost:3000/D:\myprograms\haskell\example\server\server-post-scotty\images\kit.jpg
+
+  get "/:path" $ do
+    path <- param "path" :: ActionM String
+    file path
 
   delete "/user/:token/:id" $ do
     token   <- param "token" :: ActionM String
@@ -97,7 +113,6 @@ routes pool = do
     json ()
             
         
-    
 
     
     
@@ -114,8 +129,10 @@ routes pool = do
 insertUser :: Pool Connection -> UserIn -> ActionT TL.Text IO ()
 insertUser pool (UserIn name surname avatar login password) = do
      c_date <- liftIO $ curTimeStr "%Y-%m-%d %H:%M:%S"
-     liftIO $ execSqlT pool [name, surname, avatar, login, (md5s $ Str password), c_date, "FALSE"]
-              "INSERT INTO users (name, surname, avatar, login, password, c_date, admin) VALUES(?,?,?,?,?,?,?)"
+     -- liftIO $ execSqlT pool [name, surname, avatar, login, (md5s $ Str password), c_date, "FALSE"]
+              -- "INSERT INTO users (name, surname, avatar, login, password, c_date, admin) VALUES(?,?,?,?,?,?,?)"
+     liftIO $ execSqlT pool [name, surname, avatar, login, password, c_date, "FALSE"]
+              "INSERT INTO users (name, surname, avatar, login, password, c_date, admin) VALUES(?,?,?,?, md5( ?) ,?,?)"
      return ()
 
 existLogin :: Pool Connection -> String -> IO Bool
@@ -128,13 +145,16 @@ existLogin pool login = do
 
 findUserByLogin :: Pool Connection -> String -> String -> IO (Maybe (Integer, Bool))
 findUserByLogin pool login password = do
-         res <- liftIO $ fetch pool (Only login) 
-                "SELECT user_id, password, admin  FROM users WHERE login=?" ::
-                IO [(Integer, String, Bool)]
+         -- res <- liftIO $ fetch pool (Only login) 
+                -- "SELECT user_id, password, admin  FROM users WHERE login=?" ::
+         res <- liftIO $ fetch pool [login, password] 
+                "SELECT user_id, admin  FROM users WHERE login=? AND password = md5( ?)" ::
+                IO [(Integer,  Bool)]
          return $ pass res
          where 
-           pass [(id, passw, adm)] = if passw == (md5s $ Str password) then Just (id, adm)
-                                     else Nothing
+           pass [(id, adm)] = Just (id, adm)
+           -- if passw == (md5s $ Str password) then Just (id, adm)
+                                     -- else Nothing
            pass _ = Nothing 
 
 findUserByID :: Pool Connection -> Integer -> IO (Maybe UserOut)

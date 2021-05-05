@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9c3cbc2c7df16869650d549161f88f4d7c0dd062e6c2c182593963ced8a74443
+-- hash: e5c4b7b64c37428c6faef5b21dff2b42998c359ec876b8401b73674ba735114c
 
 name:           server-post-scotty
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Config
       Controllers.Users
       Db
+      Migrations
       Models.User
       Token
   other-modules:
@@ -42,6 +43,8 @@ library
     , base >=4.7 && <5
     , bytestring
     , configurator
+    , file-embed
+    , hspec
     , http-types
     , mtl
     , postgresql-simple
@@ -64,6 +67,8 @@ executable server-post-scotty-exe
     , base >=4.7 && <5
     , bytestring
     , configurator
+    , file-embed
+    , hspec
     , http-types
     , mtl
     , postgresql-simple
@@ -78,6 +83,7 @@ test-suite server-post-scotty-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      TokenTest
       Paths_server_post_scotty
   hs-source-dirs:
       test
@@ -88,6 +94,8 @@ test-suite server-post-scotty-test
     , base >=4.7 && <5
     , bytestring
     , configurator
+    , file-embed
+    , hspec
     , http-types
     , mtl
     , postgresql-simple
