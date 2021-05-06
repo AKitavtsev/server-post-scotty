@@ -25,7 +25,8 @@ dependencies:
 - bytestring
 # - containers
 - configurator
-- file-embed
+- directory
+# - file-embed
 - hspec
 # - hspec-wai
 # - hspec-wai-json

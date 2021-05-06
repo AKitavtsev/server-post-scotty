@@ -2,38 +2,41 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 
-module Migrations
+module Migrations (runMigrations)
     where
 
 import Control.Monad (forM_, void, when)
-import Data.FileEmbed
-import Data.Function 
+
+-- import Data.Function 
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.Types   (Query (..))
+import System.Directory
 
--- import Migration
 import Database.PostgreSQL.Simple
 import Data.Pool
 import qualified Data.ByteString as BS 
-
 import qualified Data.List as L
-import qualified Data.ByteString as BS
 
-
-sortedMigrations :: [(FilePath, BS.ByteString)]
-sortedMigrations =
-  let unsorted = $(embedDir "sql")
-  in L.sortBy (compare `on` fst) unsorted
   
-runMigrations :: Pool Connection -> IO ()
-runMigrations pool = do
+runMigrations :: Pool Connection -> FilePath -> IO ()
+runMigrations pool dir = do
+    fn <- scriptsInDirectory dir 
     withResource pool $ \conn -> do
-      forM_ sortedMigrations (executeMigration conn False) 
+      forM_ fn (executeMigration conn False) 
           
-executeMigration :: Connection -> Bool -> (String, BS.ByteString) -> IO ()
-executeMigration con verbose (name, contents)  = do
-            void $ execute_ con (Query contents)
-            when verbose $ putStrLn $ "Execute:\t" ++ name
+executeMigration :: Connection -> Bool -> FilePath -> IO ()
+executeMigration con verbose fileName  = do
+            content <- BS.readFile fileName
+            void $ execute_ con (Query content)
+            when verbose $ putStrLn $ "Execute:\t" ++ fileName
             return () 
 
-            
+-- | Lists all files in the given 'FilePath' 'dir' in alphabetical order.
+scriptsInDirectory :: FilePath -> IO [FilePath]
+scriptsInDirectory dir =  do         
+        sortListDir <- fmap L.sort $ listDirectory dir
+        return (map (\x -> dir ++ "/" ++ x) sortListDir)
+    
+
+    
+    

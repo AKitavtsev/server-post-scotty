@@ -13,6 +13,7 @@ curl -v -X DELETE http://localhost:3000/user/4.02021050115300175d7b7b6892d1c18dd
 curl -v "http://localhost:3000/file/?path=D:\myprograms\haskell\example\server\server-post-scotty\images\kit.jpg"
 curl -v "http://localhost:3000/D:\myprograms\haskell\example\server\server-post-scotty\images\kit.jpg"
 
+chcp 1251
 psql -d posts -U postgres
 
 

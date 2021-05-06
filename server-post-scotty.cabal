@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e5c4b7b64c37428c6faef5b21dff2b42998c359ec876b8401b73674ba735114c
+-- hash: 31145cb90ec2a220b762d63f712df60af46ffcd62d4b0cc94630898431aef043
 
 name:           server-post-scotty
 version:        0.1.0.0
@@ -43,7 +43,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , configurator
-    , file-embed
+    , directory
     , hspec
     , http-types
     , mtl
@@ -67,7 +67,7 @@ executable server-post-scotty-exe
     , base >=4.7 && <5
     , bytestring
     , configurator
-    , file-embed
+    , directory
     , hspec
     , http-types
     , mtl
@@ -94,7 +94,7 @@ test-suite server-post-scotty-test
     , base >=4.7 && <5
     , bytestring
     , configurator
-    , file-embed
+    , directory
     , hspec
     , http-types
     , mtl

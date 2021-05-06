@@ -41,7 +41,7 @@ main = do
   mig <- getArgs
   when (mig == ["-m"]) $ do
     begin conn
-    runMigrations pool
+    runMigrations pool "sql"
     commit  conn
 
   scotty 3000 (routes pool)

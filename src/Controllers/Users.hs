@@ -84,18 +84,18 @@ routes pool = do
 
 
 -- так работает 
--- http://localhost:3000/file/?path=D:\myprograms\haskell\example\server\server-post-scotty\images\kit.jpg
-  -- get "/file" $ do
-    -- path <- param "path" :: ActionM String
-    -- file path
+-- http://localhost:3000/file/?path=images\kita.jpg
+  get "/file" $ do
+    path <- param "path" :: ActionM String
+    file path
 
     
 -- это не работает в адресной строке 
--- http://localhost:3000/D:\myprograms\haskell\example\server\server-post-scotty\images\kit.jpg
+-- http://localhost:3000/images\kita.jpg"
 
-  get "/:path" $ do
-    path <- param "path" :: ActionM String
-    file path
+  -- get "/:path" $ do
+    -- path <- param "path" :: ActionM String
+    -- file path
 
   delete "/user/:token/:id" $ do
     token   <- param "token" :: ActionM String
